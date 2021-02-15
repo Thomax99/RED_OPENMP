@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 int abs_int(int x){
     return (x > 0 ? x : -x) ;
 }
@@ -35,9 +37,20 @@ typedef struct {
     int (*f)(int a, int b) ;
 } reduction_fold_int_t ;
 
+reduction_fold_int_t alloc_reduction_fold_int_t(reduction_fold_int_t * init){
+    reduction_fold_int_t * back = malloc(sizeof(reduction_fold_int_t)) ;
+    back->element = init->element ;
+    back->f = init->f ;
+    return *back ;
+}
+
+void apply_fold_int(reduction_fold_int_t * out, reduction_fold_int_t * in){
+    out->element = out->f(out->element, in->element) ;
+}
+
 #pragma omp declare reduction(fold_int : reduction_fold_int_t : \
-    omp_out.element = omp_out.f(omp_out.element, omp_in.element)) \
-    initializer (omp_priv = omp_orig)
+    apply_fold_int(&omp_out, &omp_in)) \
+    initializer (omp_priv = alloc_reduction_fold_int_t(&omp_orig))
 
 
 typedef struct {
@@ -58,13 +71,12 @@ void sub_array(reduction_operation_array_int_t * x, reduction_operation_array_in
 }
 
 reduction_operation_array_int_t alloc_reduction_operation_array_int_t(reduction_operation_array_int_t * initial){
-    reduction_operation_array_int_t back ;
-    int array[initial->size] ;
-    back.array = array ;
+    reduction_operation_array_int_t * back = malloc(sizeof(reduction_operation_array_int_t)) ;
+    back->array = malloc(sizeof(int)*initial->size) ;
     for(int i = 0; i < initial->size; i++){
-        array[i] = initial->array[i] ;
+        back->array[i] = initial->array[i] ;
     }
-    return back ;
+    return *back ;
 }
 
 #pragma omp declare reduction(+ : reduction_operation_array_int_t : \

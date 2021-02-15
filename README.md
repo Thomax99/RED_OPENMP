@@ -36,7 +36,6 @@ reduction_fold_int_t reduction_fold_int_value ;
     reduction_fold_int_value.element = 0 ; reduction_fold_int_value.f = &int_addition ;
     #pragma omp parallel for reduction(fold_int : reduction_fold_int_value)
     for(int i = 0 ; i < data_size; i++){
-
         reduction_fold_int_value.element = reduction_fold_int_value.f(reduction_fold_int_value.element, array[i]) ;
     }
 ...

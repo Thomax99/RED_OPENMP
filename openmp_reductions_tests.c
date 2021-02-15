@@ -101,7 +101,7 @@ int fold_int_test(){
         sequential_fold_int_value = int_substraction(sequential_fold_int_value, array[i]) ;
     }
     if (sequential_fold_int_value != reduction_fold_int_value.element)
-        return 1 ;
+        return 1;
     return 0 ;
 }
 
